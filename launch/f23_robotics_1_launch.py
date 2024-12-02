@@ -228,7 +228,6 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'base_footprint'],
     )
 
-    # ROS control spawners
     controller_manager_timeout = ['--controller-manager-timeout', '50']
     controller_manager_prefix = 'python.exe' if os.name == 'nt' else ''
     diffdrive_controller_spawner = Node(
@@ -262,7 +261,6 @@ def generate_launch_description():
         respawn=True
     )
 
-    # Wait for the simulation to be ready to start controllers
     waiting_nodes = WaitForControllerConnection(
         target_driver=turtlebot_driver,
         nodes_to_start= ros_control_spawners
@@ -297,7 +295,6 @@ def generate_launch_description():
 
         turtlebot_driver,
 
-        # This action will kill all nodes once the Webots simulation has exited
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
                 target_action=webots,
