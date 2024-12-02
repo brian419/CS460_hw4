@@ -1,4 +1,5 @@
 #VRML_SIM R2023a utf8
+EXTERNPROTO "../protos/tag36_11_00000.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/devices/robotis/protos/RobotisLds01.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/cabinet/protos/Cabinet.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/tables/protos/Table.proto"
@@ -28,6 +29,7 @@ Viewpoint {
   follow "TurtleBot3Burger:LDS-01"
 }
 
+
 TurtleBot3Burger {
   translation -7.3611 -6.0432 0
   controller "<extern>"
@@ -45,8 +47,22 @@ TurtleBot3Burger {
     }
     RobotisLds01 {
     }
+    Camera {
+      name "camera"
+      width 640
+      height 480
+      fieldOfView 1.5708
+      near 0.01
+    }
   ]
 }
+
+
+tag36_11_00000 {
+  translation 1.0 0.0 0.5
+  rotation 0 1 0 1.57
+}
+
 
 CeilingLight {
   translation -6.4341 -1.0406 5
