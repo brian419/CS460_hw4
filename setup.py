@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from glob import glob
 
 package_name = 'miata_hw4'
 
@@ -14,6 +15,12 @@ data_files.append(('share/' + package_name + '/resource', [
     'resource/turtlebot_webots.urdf',
     'resource/ros2control.yml',
 ]))
+
+data_files.extend([
+    ('share/' + package_name + '/protos', glob('protos/*.proto')),
+    ('share/' + package_name + '/images', glob('images/*.png')),
+    ('share/' + package_name + '/worlds', glob('worlds/*.wbt')),
+])
 
 setup(
     name=package_name,
