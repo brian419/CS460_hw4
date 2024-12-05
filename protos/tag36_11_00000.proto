@@ -13,7 +13,7 @@ PROTO tag36_11_00000 [
         appearance PBRAppearance {
           baseColorMap ImageTexture {
             url [
-              "../images/tag36_11_00000.png"
+              "images/tag36_11_00000.png"
             ]
           }
           roughness 1

@@ -1,5 +1,7 @@
 from setuptools import find_packages, setup
 from glob import glob
+import shutil
+import os
 
 package_name = 'miata_hw4'
 

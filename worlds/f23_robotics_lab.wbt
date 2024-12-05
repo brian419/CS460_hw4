@@ -59,8 +59,8 @@ TurtleBot3Burger {
 
 
 tag36_11_00000 {
-  translation 1.0 0.0 0.5
-  rotation 0 1 0 1.57
+  translation -6.92 -6.04 0.1
+  rotation 0 -1 0 0.000791
 }
 
 
