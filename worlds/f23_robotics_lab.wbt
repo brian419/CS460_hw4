@@ -47,19 +47,27 @@ TurtleBot3Burger {
     }
     RobotisLds01 {
     }
-    Camera {
-      name "camera"
-      width 640
-      height 480
-      fieldOfView 1.5708
-      near 0.01
+    Solid {
+      name "camera_mount"
+      children [
+        Camera {
+          name "camera"
+          width 640
+          height 480
+          fieldOfView 1.5708
+          near 0.01
+        }
+      ]
+      translation 0 0 0.2  
+      rotation 0 1 0 0     
     }
   ]
 }
 
 
+
 tag36_11_00000 {
-  translation -6.92 -6.04 0.1
+  translation -2.19 -6.04 0.104
   rotation 0 -1 0 0.000791
 }
 
