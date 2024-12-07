@@ -56,12 +56,12 @@ def generate_launch_description():
         }],
     )
 
-    # v4l2_camera_node = Node(
-    #     package='v4l2_camera',
-    #     executable='v4l2_camera_node',
-    #     name='v4l2_camera',
-    #     output='screen'
-    # )
+    v4l2_camera_node = Node(
+        package='v4l2_camera',
+        executable='v4l2_camera_node',
+        name='v4l2_camera',
+        output='screen'
+    )
 
     apriltag_node = Node(
         package='apriltag_ros',
@@ -69,8 +69,10 @@ def generate_launch_description():
         name='apriltag',
         output='screen',
         remappings=[
-            ('image_rect', '/image_raw'),
-            ('camera_info', '/camera_info'),
+            # ('image_rect', '/image_raw'),
+            # ('camera_info', '/camera_info'),
+            ('image_rect', '/TurtleBot3Burger/camera/image_color'),
+            ('camera_info', '/TurtleBot3Burger/camera/camera_info'),
         ],
     )
 
