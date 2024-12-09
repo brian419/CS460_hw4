@@ -38,7 +38,9 @@ DIST_DIFF_TO_SLOW_DOWN = 0.05
 # speed in m/s
 # 0.075 = 75mm/s
 # 0.150 = 150mm/s
-DIST_SPEED = 0.15
+# DIST_SPEED = 0.15
+DIST_SPEED = 0.2
+
 
 class WallFollow(Node):
 
@@ -169,19 +171,19 @@ class WallFollow(Node):
             self.right_scans.pop(0)
 
         # If last 10 scans have same distance of something in front and sides, register as stuck
-        front_diff_threshold = 0.01
+        front_diff_threshold = 0.01 #0.01 used to be
         front_scans_sum = 0
         for scan in self.front_scans:
             front_scans_sum += scan
         front_scans_sum /= 10
 
-        left_diff_threshold = 0.01
+        left_diff_threshold = 0.01 #0.01 used to be
         left_scans_sum = 0
         for scan in self.left_scans:
             left_scans_sum += scan
         left_scans_sum /= 10
 
-        right_diff_threshold = 0.01
+        right_diff_threshold = 0.01 #0.01 used to be
         right_scans_sum = 0
         for scan in self.right_scans:
             right_scans_sum += scan
