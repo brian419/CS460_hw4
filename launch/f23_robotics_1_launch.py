@@ -1,3 +1,4 @@
+#V3
 #!/usr/bin/env python
 
 # Copyright 1996-2023 Cyberbotics Ltd.
@@ -17,6 +18,7 @@
 """Launch Webots TurtleBot3 Burger driver."""
 
 import os
+import shutil
 from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions.path_join_substitution import PathJoinSubstitution
@@ -37,6 +39,8 @@ def generate_launch_description():
     mode = LaunchConfiguration('mode')
     use_sim_time = LaunchConfiguration('use_sim_time', default=True)
 
+
+
     webots = WebotsLauncher(
         world=PathJoinSubstitution([package_dir, 'worlds', world]),
         #mode=mode,
@@ -52,6 +56,33 @@ def generate_launch_description():
         }],
     )
 
+    v4l2_camera_node = Node(
+        package='v4l2_camera',
+        executable='v4l2_camera_node',
+        name='v4l2_camera',
+        output='screen'
+    )
+
+    apriltag_node = Node(
+        package='apriltag_ros',
+        executable='apriltag_node',
+        name='apriltag',
+        output='screen',
+        remappings=[
+            # ('image_rect', '/image_raw'),
+            # ('camera_info', '/camera_info'),
+            ('image_rect', '/TurtleBot3Burger/camera/image_color'),
+            ('camera_info', '/TurtleBot3Burger/camera/camera_info'),
+        ],
+    )
+
+    rqt_image_view_node = Node(
+        package='rqt_image_view',
+        executable='rqt_image_view',
+        name='rqt_image_view',
+        output='screen'
+    )
+
     footprint_publisher = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -59,7 +90,6 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'base_footprint'],
     )
 
-    # ROS control spawners
     controller_manager_timeout = ['--controller-manager-timeout', '50']
     controller_manager_prefix = 'python.exe' if os.name == 'nt' else ''
     diffdrive_controller_spawner = Node(
@@ -93,7 +123,6 @@ def generate_launch_description():
         respawn=True
     )
 
-    # Wait for the simulation to be ready to start controllers
     waiting_nodes = WaitForControllerConnection(
         target_driver=turtlebot_driver,
         nodes_to_start= ros_control_spawners
@@ -104,7 +133,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'world',
-            default_value='f23_robotics_lab.wbt',
+            # default_value='f23_robotics_lab.wbt',
+            default_value='maze1_smallest.wbt',
             description='Choose one of the world files from `/webots_ros2_turtlebot/world` directory'
         ),
         DeclareLaunchArgument(
@@ -112,16 +142,22 @@ def generate_launch_description():
             default_value='realtime',
             description='Webots startup mode'
         ),
+        
+        
+        
         webots,
         webots._supervisor,
         waiting_nodes,
 
+        # v4l2_camera_node,
+        apriltag_node,
+        rqt_image_view_node,
+        
         robot_state_publisher,
         footprint_publisher,
 
         turtlebot_driver,
 
-        # This action will kill all nodes once the Webots simulation has exited
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
                 target_action=webots,

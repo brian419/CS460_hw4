@@ -1,4 +1,7 @@
 from setuptools import find_packages, setup
+from glob import glob
+import shutil
+import os
 
 package_name = 'miata_hw4'
 
@@ -7,13 +10,21 @@ data_files.append(('share/ament_index/resource_index/packages', ['resource/' + p
 data_files.append(('share/' + package_name + '/launch', ['launch/f23_robotics_1_launch.py']))
 
 data_files.append(('share/' + package_name + '/worlds', [
-    'worlds/f23_robotics_lab.wbt', 
+    # 'worlds/f23_robotics_lab.wbt', 
+    'worlds/maze1_smallest.wbt', 
+
 ]))
 data_files.append(('share/' + package_name, ['package.xml']))
 data_files.append(('share/' + package_name + '/resource', [
     'resource/turtlebot_webots.urdf',
     'resource/ros2control.yml',
 ]))
+
+data_files.extend([
+    ('share/' + package_name + '/protos', glob('protos/*.proto')),
+    ('share/' + package_name + '/images', glob('images/*.png')),
+    ('share/' + package_name + '/worlds', glob('worlds/*.wbt')),
+])
 
 setup(
     name=package_name,
