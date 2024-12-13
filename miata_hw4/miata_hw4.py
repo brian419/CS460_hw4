@@ -17,7 +17,7 @@ import os
 LINEAR_VEL = 0.22
 STOP_DISTANCE = 0.2
 LIDAR_ERROR = 0.05
-LIDAR_AVOID_DISTANCE = 0.7
+LIDAR_AVOID_DISTANCE = 0.6 #0.7 old
 SAFE_STOP_DISTANCE = STOP_DISTANCE + LIDAR_ERROR
 RIGHT_SIDE_INDEX = 270
 RIGHT_FRONT_INDEX = 210
@@ -39,7 +39,7 @@ DIST_DIFF_TO_SLOW_DOWN = 0.05
 # 0.075 = 75mm/s
 # 0.150 = 150mm/s
 # DIST_SPEED = 0.15
-DIST_SPEED = 0.2
+DIST_SPEED = 0.380 #old value is 0.2
 
 
 class WallFollow(Node):
@@ -71,6 +71,14 @@ class WallFollow(Node):
         
         # Write header
         # self.csv_writer.writerow(['X', 'Y'])
+
+        # Open CSV file for logging positions
+        self.csv_file = open('turtlebot_path.csv', mode='w', newline='')
+        self.csv_writer = csv.writer(self.csv_file)
+
+        # Write header to the CSV file
+        self.csv_writer.writerow(['X', 'Y'])
+
 
         self.front_scans = []
         self.left_scans = []
@@ -112,6 +120,8 @@ class WallFollow(Node):
     
     def listener_callback2(self, msg2):
         position = msg2.pose.pose.position
+        # Log position to CSV file
+        self.csv_writer.writerow([position.x, position.y])
         orientation = msg2.pose.pose.orientation
         
         (posx, posy, posz) = (position.x, position.y, position.z)
@@ -208,13 +218,14 @@ class WallFollow(Node):
                 self.following_wall = True
             self.turtlebot_moving = True
         elif self.stall:
-            self.cmd.linear.x = -0.1 
-            self.cmd.angular.z = 0.4 
+            self.cmd.linear.x = -0.2 # old value -0.1 
+            self.cmd.angular.z = 0.8 # old value 0.4 
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
             self.following_wall = False
             self.stall = False
             self.get_logger().info('Trying to get out of stall')
+
         # Detect potential stall
         elif front_lidar_min < SAFE_STOP_DISTANCE:
             if self.turtlebot_moving == True:
@@ -225,20 +236,44 @@ class WallFollow(Node):
                 self.stall = True
                 self.get_logger().info('Stopping')
                 return
+        #old code section starts
+        # If object in way, just turn left until we can move forward
+        # elif front_lidar_min < 0.9 * LIDAR_AVOID_DISTANCE:
+        #     self.cmd.linear.x = 0.07 
+        #     self.cmd.angular.z = 0.3
+        #     self.publisher_.publish(self.cmd)
+        #     self.get_logger().info('Turning')
+        #     self.turtlebot_moving = True
+        #     # Once wall is to right, mark the bot as following the wall
+        #     if right_lidar_min <= 3 * WALL_DISTANCE:
+        #         self.following_wall = True
+        #old code section ends
+
+        #new code section starts
         # If object in way, just turn left until we can move forward
         elif front_lidar_min < 0.9 * LIDAR_AVOID_DISTANCE:
-            self.cmd.linear.x = 0.07 
-            self.cmd.angular.z = 0.3
+            # Check openings on the right side
+            if right_lidar_min > LIDAR_AVOID_DISTANCE:
+                self.cmd.linear.x = 0.07
+                self.cmd.angular.z = -0.3  # turn right
+                self.get_logger().info('Turning right towards opening')
+            else:
+                # Default behavior if no right opening is found
+                self.cmd.linear.x = 0.07
+                self.cmd.angular.z = 0.3  # turn left
+                self.get_logger().info('Turning left to avoid obstacle')
+
             self.publisher_.publish(self.cmd)
-            self.get_logger().info('Turning')
             self.turtlebot_moving = True
-            # Once wall is to right, mark the bot as following the wall
-            if right_lidar_min <= 3 * WALL_DISTANCE:
-                self.following_wall = True
+            # Determine if following_wall should be set here or under different logic
+
+        #new code section ends
+
+      
         # Once the bot is following the wall, adjust left and right movement to ensure we stay close to wall
         elif self.following_wall:
             # Assume going straight forward
-            self.cmd.linear.x = 0.4
+            self.cmd.linear.x = 0.4 # old value 0.4
             self.cmd.angular.z = 0.0
             self.get_logger().info('Going straight alongside wall')
             # Adjust if needed
@@ -268,6 +303,10 @@ class WallFollow(Node):
         
         # Display the message on the console
         self.get_logger().info('Publishing: "%s"' % self.cmd)
+
+    def __del__(self):
+        # Close the CSV file when the node is destroyed
+        self.csv_file.close()
 
 def main(args=None):
     # initialize the ROS communication
